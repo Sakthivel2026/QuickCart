@@ -13,12 +13,13 @@ async function connectDB(){
     }
 
     if(!cached.promise){
-        const opts={
+        const opts = {
             bufferCommands: false
         }
-        cached.promise = (await mongoose.connect(`${process.env.MONGODB_URI}/quickcart`,opts)).then(mongoose =>{
-            return mongoose
-        })
+        // store the promise (do NOT await here) so concurrent calls share the same promise
+        cached.promise = mongoose.connect(`${process.env.MONGODB_URI}/quickcart`, opts).then((mongooseInstance) => {
+            return mongooseInstance;
+        });
     }
 
     cached.conn = await cached.promise
