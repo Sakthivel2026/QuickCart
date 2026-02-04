@@ -1,4 +1,6 @@
 import { Inngest } from "inngest";
+// connectDB will be imported dynamically in handlers to ensure availability at runtime
+import User from "../models/user";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "quickcart-next" });
@@ -10,14 +12,20 @@ export const syncUserCreation = inngest.createFunction(
     },
     { event :'clerk/user.created'},
     async ({event}) => {
-        const{ id, first_name , email_addresses, image_url} = event.data
+        const{ id, first_name, last_name, email_addresses, image_url } = event.data
         const userData = {
             _id: id,
             email: email_addresses[0].email_address,
-            name: first_name+ ''+ last_name,
+            name: first_name + ' ' + (last_name || ''),
             imageUrl: image_url
         }
-        await connectDB()
+        try {
+            const { default: connectDB } = await import("./db");
+            await connectDB();
+        } catch (err) {
+            console.error('connectDB failed (creation):', err);
+            throw err;
+        }
         await User.create(userData)
     }
 )
@@ -30,14 +38,20 @@ export const syncUserUpdate = inngest.createFunction(
     },
     { event :'clerk/user.updated'},
     async ({event}) => {
-         const{ id, first_name , email_addresses, image_url} = event.data
+         const{ id, first_name, last_name, email_addresses, image_url } = event.data
         const userData = {
             _id: id,
             email: email_addresses[0].email_address,
-            name: first_name+ ''+ last_name,
+            name: first_name + ' ' + (last_name || ''),
             imageUrl: image_url
         }
-        await connectDB()
+        try {
+            const { default: connectDB } = await import("./db");
+            await connectDB();
+        } catch (err) {
+            console.error('connectDB failed (update):', err);
+            throw err;
+        }
         await User.findByIdAndUpdate(id, userData)
     }
 )
@@ -52,7 +66,13 @@ export const syncUserDeletion = inngest.createFunction(
     async ({event}) => {
         
         const{ id } = event.data
-        await connectDB()
+        try {
+            const { default: connectDB } = await import("./db");
+            await connectDB();
+        } catch (err) {
+            console.error('connectDB failed (deletion):', err);
+            throw err;
+        }
         await User.findByIdAndDelete(id)
     }
 )
