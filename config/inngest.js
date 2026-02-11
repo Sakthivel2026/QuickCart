@@ -55,7 +55,7 @@ export const syncUserUpdate = inngest.createFunction(
             throw err;
         }
         await User.findByIdAndUpdate(id, userData)
-    }
+    } 
 )
 
 //inngest function to delete user data from a database
