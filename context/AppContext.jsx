@@ -47,7 +47,10 @@ export const AppContextProvider = (props) => {
             if (user && user.publicMetadata?.role === 'seller') {
                 setIsSeller(true)
             }
-             const { data} = await axios.get('/api/user/data',{headers:{Authorization: `Bearer ${await getToken()}`}})
+            const token = await getToken();
+            if(!token || !user) return;
+            const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
+            const { data } = await axios.get('/api/user/data', config);
              
               if(data.success){
                 setUserData(data.user)
@@ -74,9 +77,10 @@ export const AppContextProvider = (props) => {
       
         if(user){
             try{
-                const token = await getToken()
-
-                await axios.post('/api/cart/update', { cartData }, { headers: { Authorization: `Bearer ${token}` } }) 
+                const token = await getToken();
+                if(!token || !user) return;
+                const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
+                await axios.post('/api/cart/update', { cartData }, config);
                 
                   toast.success('Item added to cart')
             
@@ -98,9 +102,10 @@ export const AppContextProvider = (props) => {
         setCartItems(cartData)
          if(user){
             try{
-                const token = await getToken()
-
-                await axios.post('/api/cart/update', { cartData }, { headers: { Authorization: `Bearer ${token}` } }) 
+                const token = await getToken();
+                if(!token || !user) return;
+                const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
+                await axios.post('/api/cart/update', { cartData }, config); 
                 
                   toast.success('Cart updated')
             

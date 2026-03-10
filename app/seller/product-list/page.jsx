@@ -10,17 +10,17 @@ import toast from 'react-hot-toast';
 
 const ProductList = () => {
 
-  const { router,getToken, user } = useAppContext()
+  const { router,getToken, user, currency } = useAppContext()
 
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
   const fetchSellerProduct = async () => {
      try {
-
-      const token = await getToken()
-
-      const { data } = await axios.get('/api/product/seller-list',{headers: {Authorization: `Bearer ${token}`}})
+      const token = await getToken();
+      if(!token || !user) return;
+      const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
+      const { data } = await axios.get('/api/product/seller-list', config);
 
       if(data.success) {
       
@@ -76,7 +76,7 @@ const ProductList = () => {
                     </span>
                   </td>
                   <td className="px-4 py-3 max-sm:hidden">{product.category}</td>
-                  <td className="px-4 py-3">${product.offerPrice}</td>
+                  <td className="px-4 py-3">{currency}{product.offerPrice}</td>
                   <td className="px-4 py-3 max-sm:hidden">
                     <button onClick={() => router.push(`/product/${product._id}`)} className="flex items-center gap-1 px-1.5 md:px-3.5 py-2 bg-orange-600 text-white rounded-md">
                       <span className="hidden md:block">Visit</span>

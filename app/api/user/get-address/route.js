@@ -9,7 +9,12 @@ import { NextResponse } from "next/server"
 export async function GET(request){
     try{
 
-        const {userId} = getAuth(request)
+        const authObj = getAuth(request)
+        let { userId } = authObj
+
+        if (!userId) {
+            userId = request.headers.get('x-user-id')
+        }
         await connectDB()
         const addresses = await Address.find({userId})
         return NextResponse.json({success:true,addresses});

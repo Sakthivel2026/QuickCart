@@ -25,8 +25,10 @@ const AddAddress = () => {
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         try {
-            const token = await getToken()
-            const { data } = await axios.post('/api/user/add-address', { address }, { headers: { Authorization: `Bearer ${token}` } })
+            const token = await getToken();
+            if(!token || !user) return toast.error("Unauthorized");
+            const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
+            const { data } = await axios.post('/api/user/add-address', { address }, config);
             if (data.success) {
                 toast.success(data.message)
                 router.push('/cart')

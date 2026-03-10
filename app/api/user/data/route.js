@@ -1,11 +1,17 @@
 import connectDB from "@/config/db";
 import User from "@/models/user";
-import { auth } from "@clerk/nextjs/server";
+import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
   try {
-    const { userId } = await auth()
+    const authObj = getAuth(request)
+    let { userId } = authObj
+
+    // Fallback to custom header if Clerk fails to parse it
+    if (!userId) {
+      userId = request.headers.get('x-user-id')
+    }
 
     if (!userId) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })

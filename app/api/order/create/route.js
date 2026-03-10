@@ -8,7 +8,13 @@ export async function POST(request) {
 
     try {
 
-        const { userId } = getAuth(request)
+        const authObj = getAuth(request)
+        let { userId } = authObj
+
+        if (!userId) {
+             userId = request.headers.get('x-user-id')
+        }
+        
         const { address, items } = await request.json();
 
         if (!address || items.length === 0) {

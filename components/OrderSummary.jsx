@@ -15,7 +15,9 @@ const OrderSummary = () => {
   const fetchUserAddresses = async () => {
     try {
       const token = await getToken();
-      const { data } = await axios.get("/api/user/get-address", { headers: { Authorization: `Bearer ${token}` } });
+      if(!token || !user) return;
+      const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
+      const { data } = await axios.get("/api/user/get-address", config);
       if (data.success) {
         setUserAddresses(data.addresses);
         if (data.addresses && data.addresses.length > 0) {
@@ -48,13 +50,13 @@ const OrderSummary = () => {
           return toast.error("Your cart is empty");
         }
 
-         const token = await getToken();
+          const token = await getToken();
+          if(!token || !user) return;
+          const config = { headers: { Authorization: `Bearer ${token}`, 'x-user-id': user.id } };
           const { data } = await axios.post("/api/order/create",{
              address: selectedAddress._id,
              items: cartItemsArray
-          }, { 
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          }, config);
 
           if(data.success) {
             toast.success(data.message)

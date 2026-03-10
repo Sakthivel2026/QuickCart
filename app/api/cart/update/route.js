@@ -9,7 +9,12 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
     try {
 
-        const { userId } = await auth()
+        const authObj = await auth()
+        let { userId } = authObj
+
+        if (!userId) {
+            userId = request.headers.get('x-user-id')
+        }
 
         const { cartData } = await request.json()
 

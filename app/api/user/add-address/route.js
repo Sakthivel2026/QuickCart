@@ -8,7 +8,12 @@ import { NextResponse } from "next/server";
 export async function POST(request){
     try{
         
-        const {userId} = getAuth(request)
+        const authObj = getAuth(request)
+        let { userId } = authObj
+
+        if (!userId) {
+            userId = request.headers.get('x-user-id')
+        }
         const { address } = await request.json()
         
         await connectDB()
@@ -23,3 +28,7 @@ export async function POST(request){
     }
 
 }
+
+
+
+

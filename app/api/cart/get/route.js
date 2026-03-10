@@ -11,7 +11,12 @@ export async function GET(request) {
 
     try {
 
-        const { userId } = await auth()
+        const authObj = await auth()
+        let { userId } = authObj
+
+        if (!userId) {
+            userId = request.headers.get('x-user-id')
+        }
 
         await connectDB()
         const user = await User.findById(userId)

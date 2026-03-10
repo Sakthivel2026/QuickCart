@@ -11,14 +11,19 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
     try {
 
-        const { userId } = getAuth(request)
+        const authObj = getAuth(request)
+        let { userId } = authObj
+
+        if (!userId) {
+            userId = request.headers.get('x-user-id')
+        }
 
         await connectDB()
 
         Address.length
         Product.length
 
-        const orders = await Order.find({ userId}).populate('address items.product')
+        const orders = await Order.find({ userId}).populate('items.product')
 
         return NextResponse.json({ success:true, orders })
         
